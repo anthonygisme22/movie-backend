@@ -1,8 +1,9 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/db.js';
 
-const Watchlist = sequelize.define(
-  'Watchlist',
+// A simple Favorite model to store userId and movieId.
+const Favorite = sequelize.define(
+  'Favorite',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -12,19 +13,16 @@ const Watchlist = sequelize.define(
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      field: 'user_id', // Maps model field userId to column user_id
     },
     movieId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      field: 'movie_id', // Maps model field movieId to column movie_id
     },
   },
   {
-    tableName: 'watchlist',
-    timestamps: false,
-    underscored: true, // If you prefer snake_case for auto-generated fields
+    tableName: 'favorites',
+    timestamps: true,
   }
 );
 
-export default Watchlist;
+export default Favorite;

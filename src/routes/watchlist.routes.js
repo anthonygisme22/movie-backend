@@ -1,11 +1,13 @@
-// src/routes/watchlist.routes.js
 import { Router } from 'express';
-import authMiddleware from '../middlewares/auth.middleware.js';
-import { addToWatchlist, getWatchlist } from '../controllers/watchlist.controller.js';
+import { getWatchlist, addToWatchlist } from '../controllers/watchlist.controller.js';
+import { verifyToken } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
-router.post('/add', authMiddleware, addToWatchlist);
-router.get('/', authMiddleware, getWatchlist);
+// GET /api/watchlist - Returns the authenticated user's watchlist
+router.get('/', verifyToken, getWatchlist);
+
+// POST /api/watchlist - Adds a movie to the authenticated user's watchlist
+router.post('/', verifyToken, addToWatchlist);
 
 export default router;

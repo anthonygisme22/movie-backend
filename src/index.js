@@ -1,10 +1,16 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import axios from 'axios'; // used in controllers
-// Import your route files
+import sequelize from './config/db.js';
 import movieRoutes from './routes/movie.routes.js';
 import tmdbRoutes from './routes/tmdb.routes.js';
+import authRoutes from './routes/auth.routes.js';
+import favoriteRoutes from './routes/favorite.routes.js';
+import recommendationRoutes from './routes/recommendation.routes.js';
+import watchlistRoutes from './routes/watchlist.routes.js';
+import reviewRoutes from './routes/review.routes.js';
+
+
 
 dotenv.config();
 
@@ -18,8 +24,20 @@ app.get('/', (req, res) => {
 
 app.use('/api/movies', movieRoutes);
 app.use('/api/tmdb', tmdbRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/favorites', favoriteRoutes);
+app.use('/api/recommendations', recommendationRoutes);
+app.use('/api/watchlist', watchlistRoutes);
+app.use('/api/reviews', reviewRoutes);
+
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`Backend server running on http://localhost:${PORT}`);
-});
+sequelize
+  .sync()
+  .then(() => {
+    console.log('Database connected and synchronized!');
+    app.listen(PORT, () => console.log(`Backend server running on http://localhost:${PORT}`));
+  })
+  .catch((error) => {
+    console.error('Database connection error:', error);
+  });
