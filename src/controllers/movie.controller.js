@@ -1,24 +1,36 @@
-import Movie from '../models/Movie.js';
+const localMovies = [
+  {
+    id: 1,
+    title: 'The Invisible Man',
+    year: 2020,
+    rating: 72.5,
+    bakedscale: 'Baked',
+    tmdbId: 570670,
+  },
+  {
+    id: 2,
+    title: 'Sleepless',
+    year: 2017,
+    rating: 60,
+    bakedscale: 'Sober',
+    tmdbId: 335777,
+  },
+  {
+    id: 3,
+    title: 'Priest',
+    year: 2011,
+    rating: 43.5,
+    bakedscale: 'Sober',
+    tmdbId: 49020,
+  },
+  // Add more as needed
+];
 
 export async function getAllMovies(req, res) {
   try {
-    const movies = await Movie.findAll();
-    res.json(movies);
+    res.json(localMovies);
   } catch (error) {
-    console.error('Error fetching movies:', error);
-    res.status(500).json({ message: 'Server error fetching movies' });
-  }
-}
-
-export async function getMovieById(req, res) {
-  try {
-    const movie = await Movie.findByPk(req.params.id);
-    if (!movie) {
-      return res.status(404).json({ message: 'Movie not found' });
-    }
-    res.json(movie);
-  } catch (error) {
-    console.error('Error fetching movie by id:', error);
-    res.status(500).json({ message: 'Server error fetching movie' });
+    console.error('Error fetching local movies:', error);
+    res.status(500).json({ message: 'Error fetching local movies' });
   }
 }
