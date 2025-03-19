@@ -30,17 +30,18 @@ app.use('/api/watchlist', watchlistRoutes);
 app.use('/api/reviews', reviewRoutes);
 
 const PORT = process.env.PORT || 4000;
-
 sequelize
   .sync()
   .then(() => {
     console.log('Database connected and synchronized!');
     console.log(`ENV: ${process.env.NODE_ENV || 'development'}`);
     console.log(`PORT: ${PORT}`);
-    app.listen(PORT, () => {
-      console.log(`Backend server running on http://localhost:${PORT}`);
+    // Bind to 0.0.0.0 instead of default
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Backend server running on port ${PORT}`);
     });
   })
   .catch((error) => {
     console.error('Database connection error:', error);
   });
+
