@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import sequelize from './config/db.js';
+
+// Import your route files
 import movieRoutes from './routes/movie.routes.js';
 import tmdbRoutes from './routes/tmdb.routes.js';
 import authRoutes from './routes/auth.routes.js';
@@ -12,17 +14,36 @@ import reviewRoutes from './routes/review.routes.js';
 
 dotenv.config();
 
+// 1. Log startup environment info
+console.log('=== Starting app ===');
+console.log('NODE_ENV:', process.env.NODE_ENV || 'not set');
+console.log('PORT:', process.env.PORT || 'not set');
+
 const app = express();
 
+// 2. Basic middleware setup
 app.use(cors());
 app.use(express.json());
 
-// Root endpoint
+// 3. Debug middleware: logs every incoming request
+app.use((req, res, next) => {
+  console.log(`Incoming request: [${req.method}] ${req.url}`);
+  next();
+});
+
+// 4. Simple /ping route for debugging
+app.get('/ping', (req, res) => {
+  console.log('Reached /ping route');
+  res.send('pong');
+});
+
+// 5. Root endpoint to verify the server is running
 app.get('/', (req, res) => {
+  console.log('Reached root endpoint /');
   res.send('Movie Backend is running!');
 });
 
-// Mount API routes
+// 6. Mount your API routes
 app.use('/api/movies', movieRoutes);
 app.use('/api/tmdb', tmdbRoutes);
 app.use('/api/auth', authRoutes);
@@ -31,39 +52,40 @@ app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/watchlist', watchlistRoutes);
 app.use('/api/reviews', reviewRoutes);
 
+// 7. Port setup
 const PORT = process.env.PORT || 4000;
+let server; // will hold the server instance
 
-let server; // Variable to hold the server instance
-
-// Connect to the database and start the server
-sequelize
-  .sync()
-  .then(() => {
+// 8. Start the server inside an async function to catch DB errors
+(async function startServer() {
+  console.log('Attempting to sync database...');
+  try {
+    await sequelize.sync();
     console.log('✅ Database connected and synchronized!');
     console.log(`🌍 ENVIRONMENT: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🔌 Database URL: ${process.env.DATABASE_URL ? 'Exists' : 'Not Set'}`);
     console.log(`🚀 Server starting on port ${PORT}...`);
 
+    // 9. Listen on PORT, binding to 0.0.0.0 for Railway
     server = app.listen(PORT, '0.0.0.0', () => {
       console.log(`✅ Server is running on port ${PORT}`);
     });
-  })
-  .catch((error) => {
+  } catch (error) {
     console.error('❌ Database connection error:', error);
-  });
+  }
+})();
 
-// Graceful shutdown on SIGTERM
+// 10. Graceful shutdown on SIGTERM
 process.on('SIGTERM', () => {
   console.log('Received SIGTERM, shutting down gracefully...');
 
   if (server) {
-    // Stop accepting new connections
+    // Stop accepting new requests
     server.close(() => {
       console.log('HTTP server closed');
 
-      // Close the database connection
-      sequelize
-        .close()
+      // Close the DB connection
+      sequelize.close()
         .then(() => {
           console.log('Database connection closed');
           process.exit(0);
@@ -77,10 +99,3 @@ process.on('SIGTERM', () => {
     process.exit(0);
   }
 });
-
-// Optional: Uncomment the block below to simulate SIGTERM for local testing.
-// Remove or comment out before deploying to production.
-// setTimeout(() => {
-//   console.log('Simulating SIGTERM...');
-//   process.kill(process.pid, 'SIGTERM');
-// }, 10000);
