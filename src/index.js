@@ -10,8 +10,6 @@ import recommendationRoutes from './routes/recommendation.routes.js';
 import watchlistRoutes from './routes/watchlist.routes.js';
 import reviewRoutes from './routes/review.routes.js';
 
-
-
 dotenv.config();
 
 const app = express();
@@ -22,6 +20,7 @@ app.get('/', (req, res) => {
   res.send('Movie Backend is running!');
 });
 
+// Mount routes
 app.use('/api/movies', movieRoutes);
 app.use('/api/tmdb', tmdbRoutes);
 app.use('/api/auth', authRoutes);
@@ -30,13 +29,17 @@ app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/watchlist', watchlistRoutes);
 app.use('/api/reviews', reviewRoutes);
 
-
 const PORT = process.env.PORT || 4000;
+
 sequelize
   .sync()
   .then(() => {
     console.log('Database connected and synchronized!');
-    app.listen(PORT, () => console.log(`Backend server running on http://localhost:${PORT}`));
+    console.log(`ENV: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`PORT: ${PORT}`);
+    app.listen(PORT, () => {
+      console.log(`Backend server running on http://localhost:${PORT}`);
+    });
   })
   .catch((error) => {
     console.error('Database connection error:', error);
