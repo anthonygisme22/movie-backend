@@ -32,14 +32,17 @@ app.use('/api/reviews', reviewRoutes);
 
   const PORT = process.env.PORT || 4000;
   sequelize
-    .sync()
-    .then(() => {
-      console.log('Database connected and synchronized!');
-      
-      app.listen(PORT, '0.0.0.0', () => console.log(`Backend server running on port ${PORT}`));
-
-    })
-    .catch((error) => {
-      console.error('Database connection error:', error);
+  .sync()
+  .then(() => {
+    console.log('✅ Database connected and synchronized!');
+    console.log(`🌍 ENVIRONMENT: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🔌 Database URL: ${process.env.DATABASE_URL ? 'Exists' : 'Not Set'}`);
+    console.log(`🚀 Server starting on port ${PORT}...`);
+    
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`✅ Server is running on port ${PORT}`);
     });
-  
+  })
+  .catch((error) => {
+    console.error('❌ Database connection error:', error);
+  });
