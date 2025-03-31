@@ -13,14 +13,28 @@ export async function getRecommendations(req, res) {
       return res.status(400).json({ message: 'Query is required.' });
     }
     
-    // Update the system prompt to instruct the model to return JSON
     const response = await openaiApi.createChatCompletion({
       model: 'gpt-3.5-turbo',
       messages: [
         {
           role: 'system',
-          content:
-            'You are a helpful movie recommendation assistant. Based on a movie database, provide a list of movies that fit the description given by the user. Return the output as a JSON array where each element is an object with the keys "title", "poster_path" (optional), and "reason". For example: [{"title": "Movie Title", "poster_path": "https://example.com/poster.jpg", "reason": "Because..."}].'
+          content: `
+You are a helpful movie recommendation assistant.
+Output must be valid JSON ONLY.
+Do not include any additional text or markdown code fences.
+Return a JSON array where each element is an object with the following keys:
+- "title": string
+- "poster_path": string (this can be empty if no poster is available)
+- "reason": string
+Example:
+[
+  {
+    "title": "Inception",
+    "poster_path": "https://image.tmdb.org/t/p/w500/abc123.jpg",
+    "reason": "It features a mind-bending plot."
+  }
+]
+`
         },
         {
           role: 'user',
@@ -30,15 +44,19 @@ export async function getRecommendations(req, res) {
       max_tokens: 200,
     });
     
-    const output = response.data.choices[0].message.content.trim();
+    // Clean up output: remove code fences if they exist
+    let output = response.data.choices[0].message.content.trim();
+    output = output.replace(/```json/g, '').replace(/```/g, '');
+    
     let recommendations;
     try {
       recommendations = JSON.parse(output);
     } catch (e) {
-      // If parsing fails, fall back to raw output
       console.error('Error parsing AI response as JSON:', e);
+      // Fallback to the raw output if parsing fails.
       recommendations = output;
     }
+    
     res.json({ recommendations });
   } catch (error) {
     console.error('AI Recommendation error:', error);
