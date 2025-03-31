@@ -3,6 +3,7 @@ import { getRecommendations } from '../controllers/ai.controller.js';
 
 const router = Router();
 
-router.post('/recommend', getRecommendations);
+// Handle POST requests to /api/recommendations/ai
+router.post('/', getRecommendations);
 
 export default router;

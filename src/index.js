@@ -9,6 +9,7 @@ import tmdbRoutes from './routes/tmdb.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import favoriteRoutes from './routes/favorite.routes.js';
 import recommendationRoutes from './routes/recommendation.routes.js';
+import aiRoutes from './routes/ai.routes.js'; // new import for AI recommendations
 import watchlistRoutes from './routes/watchlist.routes.js';
 import reviewRoutes from './routes/review.routes.js';
 
@@ -49,6 +50,7 @@ app.use('/api/tmdb', tmdbRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/favorites', favoriteRoutes);
 app.use('/api/recommendations', recommendationRoutes);
+app.use('/api/recommendations/ai', aiRoutes); // AI recommendations route
 app.use('/api/watchlist', watchlistRoutes);
 app.use('/api/reviews', reviewRoutes);
 
